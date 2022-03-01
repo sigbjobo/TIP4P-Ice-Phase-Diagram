@@ -1,0 +1,13 @@
+# vim:ft=plumed
+
+
+INCLUDE FILE=plumed.smooth.dat
+
+# Target uniform distribution of the order parameter between 240 and 288 molecules
+# i.e. between 5 and 6 layers, each of 48 molecules
+
+INCLUDE FILE=plumed.strict.dat
+
+
+PRINT STRIDE=500  ARG=* FILE=COLVAR
+DUMPMULTICOLVAR STRIDE=1 DATA=refcv FILE=ORDER_PARAMETER.xyz
