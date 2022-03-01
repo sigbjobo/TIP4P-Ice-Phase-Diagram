@@ -1,0 +1,185 @@
+LAMMPS (30 Jul 2021)
+Processor partition = 0
+  using 2 OpenMP thread(s) per MPI task
+package omp 0
+using multi-threaded neighbor list subroutines
+echo both
+
+include		in.partitions
+variable        pid world 0 1 2 3
+
+include		in.temp
+variable        temperature equal 230.0
+variable	tempDamp equal 100.0
+include		in.pressure
+variable        pressure equal 1000.0
+variable        pressureDamp equal 1000.0 # This is 1 ps
+include		in.seed
+variable        seed world 745823 746732 192377 12321
+
+
+units		real
+atom_style	full
+include		in.box
+box tilt large
+read_data       water.data
+Reading data file ...
+  triclinic box = (0.0000000 0.0000000 0.0000000) to (48.231335 21.596001 16.455999) with tilt (-9.2337990 -18.467001 7.6068000)
+  4 by 2 by 2 MPI processor grid
+  reading atoms ...
+  1944 atoms
+  scanning bonds ...
+  2 = max bonds/atom
+  scanning angles ...
+  1 = max angles/atom
+  reading velocities ...
+  1944 velocities
+  reading bonds ...
+  1296 bonds
+  reading angles ...
+  648 angles
+Finding 1-2 1-3 1-4 neighbors ...
+  special bond factors lj:    0        0        0       
+  special bond factors coul:  0        0        0       
+     2 = max # of 1-2 neighbors
+     1 = max # of 1-3 neighbors
+     1 = max # of 1-4 neighbors
+     2 = max # of special neighbors
+  special bonds CPU = 0.001 seconds
+  read_data CPU = 0.010 seconds
+include 	in.setup
+variable	out_freq equal 500
+variable	out_freq2 equal 500
+
+timestep	2.0
+
+neigh_modify    delay 7 every 1
+
+include		in.tip4p
+# This is TIP4P/Ice
+
+# create groups ###
+group ox type 2
+648 atoms in group ox
+group hy type 1
+1296 atoms in group hy
+
+# set charges - beside manually ###
+set group ox charge -1.1794
+Setting atom values ...
+  648 settings made for charge
+set group hy charge 0.5897
+Setting atom values ...
+  1296 settings made for charge
+
+# ### TIP3P Potential Parameters ###
+pair_style lj/cut/tip4p/long 2 1 1 1 0.1577 8.5
+pair_coeff 1 1*2 0.000 0.000
+pair_coeff 2 2 0.21084 3.1668
+bond_style  harmonic
+bond_coeff  1 450 0.9572
+angle_style harmonic
+angle_coeff 1 55 104.52
+kspace_style pppm/tip4p 1.0e-5
+pair_modify tail yes
+
+thermo          ${out_freq}
+thermo          500
+thermo_style 	custom step temp pe etotal epair emol press lx ly lz vol pxx pyy pzz pxy pxz pyz
+
+restart 	${out_freq} restart.lmp.${pid} restart2.lmp.${pid}
+restart 	500 restart.lmp.${pid} restart2.lmp.${pid}
+restart 	500 restart.lmp.0 restart2.lmp.${pid}
+restart 	500 restart.lmp.0 restart2.lmp.0
+
+
+timer           timeout 23:30:00 every 1000
+New timer settings: style=normal  mode=nosync  timeout=23:30:00
+
+fix             1 all plumed plumedfile plumed.equil.dat outfile plumed.equil.out
+fix 		2 all shake 1e-6 200 0 b 1 a 1
+       0 = # of size 2 clusters
+       0 = # of size 3 clusters
+       0 = # of size 4 clusters
+     648 = # of frozen angles
+  find clusters CPU = 0.000 seconds
+fix             3 all nph x ${pressure} ${pressure} ${pressureDamp}
+fix             3 all nph x 1000 ${pressure} ${pressureDamp}
+fix             3 all nph x 1000 1000 ${pressureDamp}
+fix             3 all nph x 1000 1000 1000
+fix             4 all temp/csvr ${temperature} ${temperature} ${tempDamp} ${seed}
+fix             4 all temp/csvr 230 ${temperature} ${tempDamp} ${seed}
+fix             4 all temp/csvr 230 230 ${tempDamp} ${seed}
+fix             4 all temp/csvr 230 230 100 ${seed}
+fix             4 all temp/csvr 230 230 100 745823
+velocity 	all create ${temperature} ${seed} dist gaussian
+velocity 	all create 230 ${seed} dist gaussian
+velocity 	all create 230 745823 dist gaussian
+
+run             5000 upto
+PPPM initialization ...
+  extracting TIP4P info from pair style
+  using 12-bit tables for long-range coulomb (../kspace.cpp:340)
+  G vector (1/distance) = 0.38082859
+  grid = 50 40 50
+  stencil order = 5
+  estimated absolute RMS force accuracy = 0.0021234448
+  estimated relative force accuracy = 6.3946908e-06
+  using double precision FFTW3
+  3d grid and FFT values/proc = 23142 8000
+Last active /omp style is kspace_style pppm/tip4p/omp
+Neighbor list info ...
+  update every 1 steps, delay 7 steps, check yes
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 10.8154
+  ghost atom cutoff = 10.8154
+  binsize = 5.4077, bins = 15 6 4
+  1 neighbor lists, perpetual/occasional/extra = 1 0 0
+  (1) pair lj/cut/tip4p/long/omp, perpetual
+      attributes: half, newton on, omp
+      pair build: half/bin/newton/tri/omp
+      stencil: half/bin/3d/tri
+      bin: standard
+Per MPI rank memory allocation (min/avg/max) = 10.89 | 10.95 | 11.12 Mbytes
+Step Temp PotEng TotEng E_pair E_mol Press Lx Ly Lz Volume Pxx Pyy Pzz Pxy Pxz Pyz 
+       0          230   -9209.5875   -8321.7532   -9209.5875            0    55765.299    48.231335    21.596001    16.455999    17140.634    58886.062    53603.164     54806.67    1847.1858    510.38116   -3947.9067 
+     500    231.77245   -9162.8901   -8268.2139   -9162.8901            0   -287.27519    49.071623    21.596001    16.455999    17439.258   -127.96608    359.87237   -1093.7319   -364.22855   -1030.8669   -203.45619 
+    1000    230.49744   -9206.3457   -8316.5913   -9206.5171            0    2961.9943    48.702743    21.596001    16.455999    17308.165      2765.83    3315.2112    2804.9419   -55.266876   -547.46933    374.37541 
+    1500    231.54806   -9183.3276   -8289.5176   -9183.3276            0    1078.7573    49.152897    21.596001    16.455999    17468.142   -482.51608    1507.3641     2211.424    464.01748   -440.29665    988.70392 
+    2000    238.85103   -9228.8262   -8306.8256   -9228.8262            0    445.41241    48.975151    21.596001    16.455999    17404.974    267.77634    21.500446    1046.9605    349.77698   -595.52429    858.50635 
+    2500    233.37353    -9197.639   -8296.7824    -9197.639            0    1672.7821    48.882151    21.596001    16.455999    17371.923    1284.4762    1718.8293    2015.0408    814.05572   -410.34701     54.00214 
+    3000    236.36773   -9244.4432   -8332.0285   -9244.4432            0    381.97273      49.1214    21.596001    16.455999    17456.948    213.47105    1050.3526   -117.90544   -98.279829   -1181.0104    113.02824 
+    3500    224.70912   -9195.5816   -8328.1709   -9195.7429            0    2986.0513    48.861928    21.596001    16.455999    17364.736     2801.352    2950.6603    3206.1414    412.09295    80.474819    821.29642 
+    4000    228.60312   -9236.8347   -8354.3926   -9236.8347            0    851.90196    49.215625    21.596001    16.455999    17490.434    414.53776    474.98921    1666.1789    280.12406   -795.53628    1241.5803 
+    4500    227.79768    -9202.214    -8322.881    -9202.214            0     40.94391    49.516702    21.596001    16.455999    17597.432   -873.99033    864.80178    132.02028   -99.975303   -795.18705    220.98698 
+    5000    224.37246   -9173.7544   -8307.6433   -9173.7544            0     1251.844    49.143356    21.596001    16.455999    17464.751     564.1653    1884.0044    1307.3623   -73.650187   -470.28869    920.36959 
+Loop time of 55.1407 on 32 procs for 5000 steps with 1944 atoms
+
+Performance: 15.669 ns/day, 1.532 hours/ns, 90.677 timesteps/s
+194.1% CPU use with 16 MPI tasks x 2 OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 2.4915     | 2.9572     | 3.6488     |  15.7 |  5.36
+Bond    | 0.01567    | 0.024563   | 0.047771   |   5.4 |  0.04
+Kspace  | 13.042     | 13.811     | 14.224     |   7.5 | 25.05
+Neigh   | 0.25659    | 0.28211    | 0.29456    |   1.9 |  0.51
+Comm    | 2.2963     | 2.8868     | 3.1398     |  11.9 |  5.24
+Output  | 0.051489   | 0.051528   | 0.051571   |   0.0 |  0.09
+Modify  | 33.374     | 33.768     | 35.213     |   8.6 | 61.24
+Other   |            | 1.359      |            |       |  2.47
+
+Nlocal:        121.500 ave         135 max         105 min
+Histogram: 2 1 0 1 0 4 1 3 3 1
+Nghost:        4826.06 ave        4886 max        4754 min
+Histogram: 1 1 2 1 1 4 1 1 3 1
+Neighs:        35931.7 ave       40610 max       29529 min
+Histogram: 2 1 0 2 0 4 0 2 2 3
+
+Total # of neighbors = 574907
+Ave neighs/atom = 295.73405
+Ave special neighs/atom = 2.0000000
+Neighbor list builds = 246
+Dangerous builds = 0
+Total wall time: 0:00:55

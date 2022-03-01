@@ -1,0 +1,29 @@
+/expanse/lustre/projects/slc103/sbore/research_storage/ice_liquid_interface/TIP4P_ICE/IceII_Liquid/4-PrepareCoexistenceConfiguration/MELT_BOX
+exp-5-33
+Thu Dec 23 00:52:25 PST 2021
+srun: error: exp-5-33: tasks 11,49: Exited with exit code 1
+srun: error: exp-5-33: tasks 8,69,81,118: Exited with exit code 1
+LAMMPS (30 Jul 2021)
+  using 1 OpenMP thread(s) per MPI task
+using multi-threaded neighbor list subroutines
+
+include		in.partitions
+variable        pid world 0
+include		in.temp
+variable	temperature equal 250.0
+variable	melttemp equal 450.0
+variable	tempDamp equal 100.0
+include		in.pressure
+variable        pressure equal 3000.
+variable        pressureDamp equal 1000.0 # This is 1 ps
+include		in.seed
+variable        seed world 745823
+
+units		real
+atom_style	full
+box tilt large
+read_data	ice_avg_equil.data
+ERROR: Cannot open file ice_avg_equil.data: No such file or directory (../read_data.cpp:312)
+Last command: read_data	ice_avg_equil.data
+srun: error: exp-5-33: tasks 0-7,9-10,12-48,50-68,70-80,82-117,119-127: Exited with exit code 1
+Thu Dec 23 00:52:46 PST 2021

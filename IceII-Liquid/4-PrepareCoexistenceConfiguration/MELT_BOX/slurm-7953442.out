@@ -1,0 +1,29 @@
+/expanse/lustre/projects/slc103/sbore/research_storage/ice_liquid_interface/TIP4P_ICE/IceII_Liquid/4-PrepareCoexistenceConfiguration/MELT_BOX
+exp-2-11
+Thu Dec 23 01:06:24 PST 2021
+LAMMPS (30 Jul 2021)
+  using 1 OpenMP thread(s) per MPI task
+using multi-threaded neighbor list subroutines
+
+include		in.partitions
+variable        pid world 0
+include		in.temp
+variable	temperature equal 250.0
+variable	melttemp equal 450.0
+variable	tempDamp equal 100.0
+include		in.pressure
+variable        pressure equal 3000.
+variable        pressureDamp equal 1000.0 # This is 1 ps
+include		in.seed
+variable        seed world 745823
+
+units		real
+atom_style	full
+box tilt large
+include		in.box
+box tilt large
+read_data       iceII.data
+ERROR: Cannot open file iceII.data: No such file or directory (../read_data.cpp:312)
+Last command: read_data       iceII.data
+srun: error: exp-2-11: tasks 0-127: Exited with exit code 1
+Thu Dec 23 01:06:43 PST 2021

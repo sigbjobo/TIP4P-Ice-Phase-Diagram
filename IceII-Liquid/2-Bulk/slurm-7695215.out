@@ -1,0 +1,212 @@
+/expanse/lustre/projects/slc103/sbore/research_storage/ice_liquid_interface/TIP4P_ICE/IceII_Liquid/2-Bulk
+exp-1-12
+Sun Dec 12 07:12:07 PST 2021
+/expanse/lustre/projects/slc103/sbore/research_storage/ice_liquid_interface/TIP4P_ICE/IceII_Liquid/2-Bulk/IceII_1000atm
+/expanse/lustre/projects/slc103/sbore/research_storage/ice_liquid_interface/TIP4P_ICE/IceII_Liquid/2-Bulk/IceII_2000atm
+/expanse/lustre/projects/slc103/sbore/research_storage/ice_liquid_interface/TIP4P_ICE/IceII_Liquid/2-Bulk/IceII_3000atm
+/expanse/lustre/projects/slc103/sbore/research_storage/ice_liquid_interface/TIP4P_ICE/IceII_Liquid/2-Bulk/IceII_4000atm
+LAMMPS (30 Jul 2021)
+  using 32 OpenMP thread(s) per MPI task
+using multi-threaded neighbor list subroutines
+
+include		in.partitions
+variable        pid world 0
+include		in.temp
+variable	temperature equal 270.0
+variable	tempDamp equal 100.0
+include		in.pressure
+variable        pressure equal 4000
+variable        pressureDamp equal 1000.0 # This is 1 ps
+include		in.seed
+variable        seed world 745823
+
+units		real
+atom_style	full
+include		in.box
+read_data       iceII.data
+Reading data file ...
+  triclinic box = (-9.1550010 -6.9293180 -0.0020880000) to (14.184999 14.539316 16.392087) with tilt (-9.1571480 -9.1571500 -13.861210)
+ERROR: Triclinic box skew is too large (../domain.cpp:217)
+Last command: read_data       iceII.data
+srun: error: exp-1-12: task 0: Exited with exit code 1
+LAMMPS (30 Jul 2021)
+  using 32 OpenMP thread(s) per MPI task
+using multi-threaded neighbor list subroutines
+
+include		in.partitions
+variable        pid world 0
+include		in.temp
+variable	temperature equal 270.0
+variable	tempDamp equal 100.0
+include		in.pressure
+variable        pressure equal 2000
+variable        pressureDamp equal 1000.0 # This is 1 ps
+include		in.seed
+variable        seed world 745823
+
+units		real
+atom_style	full
+include		in.box
+read_data       iceII.data
+Reading data file ...
+  triclinic box = (-9.1550010 -6.9293180 -0.0020880000) to (14.184999 14.539316 16.392087) with tilt (-9.1571480 -9.1571500 -13.861210)
+ERROR: Triclinic box skew is too large (../domain.cpp:217)
+Last command: read_data       iceII.data
+srun: error: exp-1-12: task 0: Exited with exit code 1
+LAMMPS (30 Jul 2021)
+  using 32 OpenMP thread(s) per MPI task
+using multi-threaded neighbor list subroutines
+
+include		in.partitions
+variable        pid world 0
+include		in.temp
+variable	temperature equal 270.0
+variable	tempDamp equal 100.0
+include		in.pressure
+variable        pressure equal 1000
+variable        pressureDamp equal 1000.0 # This is 1 ps
+include		in.seed
+variable        seed world 745823
+
+units		real
+atom_style	full
+include		in.box
+read_data       iceII.data
+Reading data file ...
+  triclinic box = (-9.1550010 -6.9293180 -0.0020880000) to (14.184999 14.539316 16.392087) with tilt (-9.1571480 -9.1571500 -13.861210)
+ERROR: Triclinic box skew is too large (../domain.cpp:217)
+Last command: read_data       iceII.data
+srun: error: exp-1-12: task 0: Exited with exit code 1
+LAMMPS (30 Jul 2021)
+  using 32 OpenMP thread(s) per MPI task
+using multi-threaded neighbor list subroutines
+
+include		in.partitions
+variable        pid world 0
+include		in.temp
+variable	temperature equal 270.0
+variable	tempDamp equal 100.0
+include		in.pressure
+variable        pressure equal 3000
+variable        pressureDamp equal 1000.0 # This is 1 ps
+include		in.seed
+variable        seed world 745823
+
+units		real
+atom_style	full
+include		in.box
+box tilt large
+read_data       iceII.data
+Reading data file ...
+  triclinic box = (-9.1550010 -6.9293180 -0.0020880000) to (14.184999 14.539316 16.392087) with tilt (-9.1571480 -9.1571500 -13.861210)
+WARNING: Triclinic box skew is large (../domain.cpp:219)
+  1 by 1 by 1 MPI processor grid
+  reading atoms ...
+  972 atoms
+  scanning bonds ...
+  2 = max bonds/atom
+  scanning angles ...
+  1 = max angles/atom
+  reading bonds ...
+  648 bonds
+  reading angles ...
+  324 angles
+Finding 1-2 1-3 1-4 neighbors ...
+  special bond factors lj:    0        0        0       
+  special bond factors coul:  0        0        0       
+     2 = max # of 1-2 neighbors
+     1 = max # of 1-3 neighbors
+     1 = max # of 1-4 neighbors
+     2 = max # of special neighbors
+  special bonds CPU = 0.000 seconds
+  read_data CPU = 0.068 seconds
+include 	in.setup
+variable	out_freq equal 500
+variable	out_freq2 equal 500
+
+timestep	2.0
+
+neigh_modify    delay 7 every 1
+
+include		in.tip4p
+# This is TIP4P/Ice
+
+# create groups ###
+group ox type 2
+324 atoms in group ox
+group hy type 1
+648 atoms in group hy
+
+# set charges - beside manually ###
+set group ox charge -1.1794
+Setting atom values ...
+  324 settings made for charge
+set group hy charge 0.5897
+Setting atom values ...
+  648 settings made for charge
+
+# ### TIP3P Potential Parameters ###
+pair_style lj/cut/tip4p/long 2 1 1 1 0.1577 8.5
+pair_coeff 1 1*2 0.000 0.000
+pair_coeff 2 2 0.21084 3.1668
+bond_style  harmonic
+bond_coeff  1 450 0.9572
+angle_style harmonic
+angle_coeff 1 55 104.52
+kspace_style pppm/tip4p 1.0e-5
+pair_modify tail yes
+
+thermo          ${out_freq}
+thermo          500
+thermo_style 	custom step temp pe etotal epair emol press lx ly lz xy xz yz vol pxx pyy pzz pxy pxz pyz
+
+restart 	${out_freq} restart.lmp.${pid} restart2.lmp.${pid}
+restart 	500 restart.lmp.${pid} restart2.lmp.${pid}
+restart 	500 restart.lmp.0 restart2.lmp.${pid}
+restart 	500 restart.lmp.0 restart2.lmp.0
+
+
+include         in.dump
+dump            myDump all atom ${out_freq2} dump.water.${pid}
+dump            myDump all atom 500 dump.water.${pid}
+dump            myDump all atom 500 dump.water.0
+dump            myDump2 all dcd ${out_freq2} dump.dcd
+dump            myDump2 all dcd 500 dump.dcd
+dump_modify     myDump append yes
+dump_modify     myDump2 append yes
+
+
+timer           timeout 00:55:00 every 1000
+New timer settings: style=normal  mode=nosync  timeout=00:55:00
+
+fix 		1 all shake 1e-6 200 0 b 1 a 1
+Finding SHAKE clusters ...
+       0 = # of size 2 clusters
+       0 = # of size 3 clusters
+       0 = # of size 4 clusters
+     324 = # of frozen angles
+  find clusters CPU = 0.000 seconds
+fix             2 all nph tri ${pressure} ${pressure} ${pressureDamp}
+fix             2 all nph tri 3000 ${pressure} ${pressureDamp}
+fix             2 all nph tri 3000 3000 ${pressureDamp}
+fix             2 all nph tri 3000 3000 1000
+fix             3 all temp/csvr ${temperature} ${temperature} ${tempDamp} ${seed}
+fix             3 all temp/csvr 270 ${temperature} ${tempDamp} ${seed}
+fix             3 all temp/csvr 270 270 ${tempDamp} ${seed}
+fix             3 all temp/csvr 270 270 100 ${seed}
+fix             3 all temp/csvr 270 270 100 745823
+velocity 	all create ${temperature} ${seed} dist gaussian
+velocity 	all create 270 ${seed} dist gaussian
+velocity 	all create 270 745823 dist gaussian
+
+run             500000
+PPPM initialization ...
+  extracting TIP4P info from pair style
+  using 12-bit tables for long-range coulomb (../kspace.cpp:340)
+  G vector (1/distance) = 0.38865022
+  grid = 30 36 48
+  stencil order = 5
+  estimated absolute RMS force accuracy = 0.0014031681
+srun: Job step aborted: Waiting up to 32 seconds for job step to finish.
+slurmstepd: error: *** JOB 7695215 ON exp-1-12 CANCELLED AT 2021-12-12T07:12:58 ***
+slurmstepd: error: *** STEP 7695215.1 ON exp-1-12 CANCELLED AT 2021-12-12T07:12:58 ***
