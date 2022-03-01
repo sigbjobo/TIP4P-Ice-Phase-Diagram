@@ -1,0 +1,15 @@
+
+
+# Strict CV
+ENVIRONMENTSIMILARITY ...
+ SPECIES=1-1728:3
+ SIGMA=0.070
+ CRYSTAL_STRUCTURE=CUSTOM
+ LABEL=refcv2
+ REFERENCE_1=env1h.pdb
+ REFERENCE_2=env2h.pdb
+ REFERENCE_3=env3h.pdb
+ REFERENCE_4=env4h.pdb
+ MORE_THAN={CUBIC D_0=0.7275 D_MAX=0.7276} # Change this value to the point where distributions meet
+ MEAN
+... ENVIRONMENTSIMILARITY

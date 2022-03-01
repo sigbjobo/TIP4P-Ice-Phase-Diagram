@@ -1,0 +1,12 @@
+# vim:ft=plumed
+
+
+INCLUDE FILE=plumed.smooth.dat
+
+# Use wall potential too keep colective variable within limits
+uwall: UPPER_WALLS ARG=refcv.morethan AT=288. KAPPA=1.0 EXP=2 STRIDE=2
+lwall: LOWER_WALLS ARG=refcv.morethan AT=240. KAPPA=1.0 EXP=2 STRIDE=2
+
+INCLUDE FILE=plumed.strict.dat
+
+PRINT STRIDE=500  ARG=* FILE=COLVAR-EQUILIBRATE

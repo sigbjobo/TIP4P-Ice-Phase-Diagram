@@ -1,0 +1,19 @@
+/expanse/lustre/projects/slc103/sbore/research_storage/ice_liquid_interface/1-Bulk/IceIh_2500bar
+exp-12-49
+Fri Oct 15 19:31:59 PDT 2021
+ERROR: Processor partitions do not match number of allocated processors (../lammps.cpp:437)
+srun: error: exp-12-49: tasks 0-3: Exited with exit code 1
+cp: cannot stat 'log.lammps.0': No such file or directory
+cp: cannot stat 'log.lammps.1': No such file or directory
+cp: cannot stat 'restart2.lmp.1': No such file or directory
+cp: cannot stat 'restart.lmp.1': No such file or directory
+cp: cannot stat 'data.final.1': No such file or directory
+cp: cannot stat 'log.lammps.2': No such file or directory
+cp: cannot stat 'restart2.lmp.2': No such file or directory
+cp: cannot stat 'restart.lmp.2': No such file or directory
+cp: cannot stat 'data.final.2': No such file or directory
+cp: cannot stat 'log.lammps.3': No such file or directory
+cp: cannot stat 'restart2.lmp.3': No such file or directory
+cp: cannot stat 'restart.lmp.3': No such file or directory
+cp: cannot stat 'data.final.3': No such file or directory
+Fri Oct 15 19:32:00 PDT 2021

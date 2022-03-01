@@ -1,0 +1,164 @@
+/expanse/lustre/projects/slc103/sbore/research_storage/ice_liquid_interface/1-Bulk/IceIh_2500bar
+exp-1-21
+Fri Oct 15 16:33:17 PDT 2021
+LAMMPS (30 Jul 2021)
+  using 32 OpenMP thread(s) per MPI task
+using multi-threaded neighbor list subroutines
+
+include		in.partitions
+variable        pid world 0
+include		in.temp
+variable	temperature equal 270.0
+variable	tempDamp equal 100.0
+include		in.pressure
+variable        pressure equal 2500
+variable        pressureDamp equal 1000.0 # This is 1 ps
+include		in.seed
+variable        seed world 745823
+
+units		real
+atom_style	full
+include		in.box
+read_data       water.data
+Reading data file ...
+  orthogonal box = (0.0000000 0.0000000 0.0000000) to (18.207572 23.629178 22.213196)
+  1 by 1 by 1 MPI processor grid
+  reading atoms ...
+  864 atoms
+  reading velocities ...
+  864 velocities
+  scanning bonds ...
+  2 = max bonds/atom
+  scanning angles ...
+  1 = max angles/atom
+  reading bonds ...
+  576 bonds
+  reading angles ...
+  288 angles
+Finding 1-2 1-3 1-4 neighbors ...
+  special bond factors lj:    0        0        0       
+  special bond factors coul:  0        0        0       
+     2 = max # of 1-2 neighbors
+     1 = max # of 1-3 neighbors
+     1 = max # of 1-4 neighbors
+     2 = max # of special neighbors
+  special bonds CPU = 0.000 seconds
+  read_data CPU = 0.011 seconds
+include 	in.setup
+variable	out_freq equal 500
+variable	out_freq2 equal 500
+
+timestep	2.0
+
+neigh_modify    delay 7 every 1
+
+include		in.tip4p
+# This is TIP4P/Ice
+
+# create groups ###
+group ox type 2
+288 atoms in group ox
+group hy type 1
+576 atoms in group hy
+
+# set charges - beside manually ###
+set group ox charge -1.1794
+Setting atom values ...
+  288 settings made for charge
+set group hy charge 0.5897
+Setting atom values ...
+  576 settings made for charge
+
+# ### TIP3P Potential Parameters ###
+pair_style lj/cut/tip4p/long 2 1 1 1 0.1577 8.5
+pair_coeff 1 1*2 0.000 0.000
+pair_coeff 2 2 0.21084 3.1668
+bond_style  harmonic
+bond_coeff  1 450 0.9572
+angle_style harmonic
+angle_coeff 1 55 104.52
+kspace_style pppm/tip4p 1.0e-5
+pair_modify tail yes
+
+thermo          ${out_freq}
+thermo          500
+thermo_style 	custom step temp pe etotal epair emol press lx ly lz vol pxx pyy pzz pxy pxz pyz
+thermo_modify   flush yes
+restart 	${out_freq} restart.lmp.${pid} restart2.lmp.${pid}
+restart 	500 restart.lmp.${pid} restart2.lmp.${pid}
+restart 	500 restart.lmp.0 restart2.lmp.${pid}
+restart 	500 restart.lmp.0 restart2.lmp.0
+
+
+include         in.dump
+dump            myDump all atom ${out_freq2} dump.water.${pid}
+dump            myDump all atom 500 dump.water.${pid}
+dump            myDump all atom 500 dump.water.0
+dump            myDump2 all dcd ${out_freq2} dump.dcd
+dump            myDump2 all dcd 500 dump.dcd
+dump_modify     myDump append yes
+dump_modify     myDump2 append yes
+
+
+timer           timeout 23:50:00 every 1000
+New timer settings: style=normal  mode=nosync  timeout=23:50:00
+
+fix 		1 all shake 1e-6 200 0 b 1 a 1
+Finding SHAKE clusters ...
+       0 = # of size 2 clusters
+       0 = # of size 3 clusters
+       0 = # of size 4 clusters
+     288 = # of frozen angles
+  find clusters CPU = 0.000 seconds
+fix             2 all nph aniso ${pressure} ${pressure} ${pressureDamp}
+fix             2 all nph aniso 2500 ${pressure} ${pressureDamp}
+fix             2 all nph aniso 2500 2500 ${pressureDamp}
+fix             2 all nph aniso 2500 2500 1000
+fix             3 all temp/csvr ${temperature} ${temperature} ${tempDamp} ${seed}
+fix             3 all temp/csvr 270 ${temperature} ${tempDamp} ${seed}
+fix             3 all temp/csvr 270 270 ${tempDamp} ${seed}
+fix             3 all temp/csvr 270 270 100 ${seed}
+fix             3 all temp/csvr 270 270 100 745823
+velocity 	all create ${temperature} ${seed} dist gaussian
+velocity 	all create 270 ${seed} dist gaussian
+velocity 	all create 270 745823 dist gaussian
+
+run             1000000
+PPPM initialization ...
+  extracting TIP4P info from pair style
+  using 12-bit tables for long-range coulomb (../kspace.cpp:340)
+  G vector (1/distance) = 0.37089722
+  grid = 24 27 25
+  stencil order = 5
+  estimated absolute RMS force accuracy = 0.0032495733
+  estimated relative force accuracy = 9.7859934e-06
+  using double precision FFTW3
+  3d grid and FFT values/proc = 35904 16200
+Last active /omp style is kspace_style pppm/tip4p/omp
+Neighbor list info ...
+  update every 1 steps, delay 7 steps, check yes
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 10.8154
+  ghost atom cutoff = 10.8154
+  binsize = 5.4077, bins = 4 5 5
+  1 neighbor lists, perpetual/occasional/extra = 1 0 0
+  (1) pair lj/cut/tip4p/long/omp, perpetual
+      attributes: half, newton on, omp
+      pair build: half/bin/newton/omp
+      stencil: half/bin/3d
+      bin: standard
+Setting up Verlet run ...
+  Unit style    : real
+  Current step  : 0
+  Time step     : 2
+  Walltime left : 23:49:59.95
+Per MPI rank memory allocation (min/avg/max) = 39.73 | 39.73 | 39.73 Mbytes
+Step Temp PotEng TotEng E_pair E_mol Press Lx Ly Lz Volume Pxx Pyy Pzz Pxy Pxz Pyz 
+       0          270   -5396.4194   -4933.6487   -5396.4194            0     -8991.61    18.207572    23.629178    22.213196    9556.7825    -9272.227   -9505.9789   -8196.6242   -1637.6985    784.46514    906.24441 
+     500    265.66867   -4207.5079   -3752.1608   -4207.5079            0    2819.4891    18.028191    23.360741    22.049712    9286.2783    3540.4268    2952.5548    1965.4857   -670.63705   -732.81597    368.87802 
+    1000    257.94104   -4194.9783   -3752.8762   -4194.9783            0    291.81373    18.049165    23.623835    22.111696    9428.2171    1515.2721    1481.0421    -2120.873    429.21908   -163.36306   -229.63211 
+    1500    270.41584   -4222.2921   -3758.8086   -4222.2921            0    3289.3148    18.038398    23.209029    21.928291    9180.3599    1671.0621    2699.6044     5497.278    517.99686    386.50382   -212.97763 
+    2000     266.3577   -4205.4019   -3748.8739   -4205.4019            0    3552.7532    18.023331    23.581376    21.669833    9210.0029    4944.9468    1947.9291    3765.3836      872.413    312.27364   -266.51813 
+    2500    270.55306    -4198.093   -3734.3743    -4198.093            0    2661.8655    18.049696    23.437561     21.90803    9267.9914    1670.4081    2644.1771    3671.0113     -200.638    646.10708   -316.20564 
+srun: Job step aborted: Waiting up to 32 seconds for job step to finish.
+slurmstepd: error: *** JOB 6514187 ON exp-1-21 CANCELLED AT 2021-10-15T16:46:19 ***

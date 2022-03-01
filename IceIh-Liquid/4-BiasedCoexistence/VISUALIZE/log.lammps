@@ -1,0 +1,104 @@
+LAMMPS (30 Jul 2021)
+OMP_NUM_THREADS environment is not set. Defaulting to 1 thread. (../comm.cpp:98)
+  using 1 OpenMP thread(s) per MPI task
+echo both
+
+include		in.partitions
+variable        pid world 0
+include		in.temp
+variable	temperature equal 270.0
+variable	tempDamp equal 100.0
+include		in.pressure
+variable        pressure equal 1.
+variable        pressureDamp equal 1000.0 # This is 1 ps
+include		in.seed
+variable        seed equal 745823
+
+units		real
+atom_style	full
+include		in.box
+read_data       water.data
+Reading data file ...
+  orthogonal box = (0.0000000 0.0000000 0.0000000) to (18.167000 45.801891 22.194000)
+  1 by 1 by 1 MPI processor grid
+  reading atoms ...
+  1728 atoms
+  scanning bonds ...
+  2 = max bonds/atom
+  scanning angles ...
+  1 = max angles/atom
+  reading bonds ...
+  1152 bonds
+  reading angles ...
+  576 angles
+Finding 1-2 1-3 1-4 neighbors ...
+  special bond factors lj:    0        0        0       
+  special bond factors coul:  0        0        0       
+     2 = max # of 1-2 neighbors
+     1 = max # of 1-3 neighbors
+     1 = max # of 1-4 neighbors
+     2 = max # of special neighbors
+  special bonds CPU = 0.000 seconds
+  read_data CPU = 0.007 seconds
+include 	in.setup
+variable	out_freq equal 500
+variable	out_freq2 equal 500
+
+timestep	2.0
+
+neigh_modify    delay 7 every 1
+
+include		in.tip4p
+# This is TIP4P/Ice
+
+# create groups ###
+group ox type 2
+576 atoms in group ox
+group hy type 1
+1152 atoms in group hy
+
+# set charges - beside manually ###
+set group ox charge -1.1794
+Setting atom values ...
+  576 settings made for charge
+set group hy charge 0.5897
+Setting atom values ...
+  1152 settings made for charge
+
+# ### TIP3P Potential Parameters ###
+pair_style lj/cut/tip4p/long 2 1 1 1 0.1577 8.5
+pair_coeff 1 1*2 0.000 0.000
+pair_coeff 2 2 0.21084 3.1668
+bond_style  harmonic
+bond_coeff  1 450 0.9572
+angle_style harmonic
+angle_coeff 1 55 104.52
+kspace_style pppm/tip4p 1.0e-5
+pair_modify tail yes
+
+thermo          ${out_freq}
+thermo          500
+thermo_style 	custom step temp pe etotal epair emol press lx ly lz vol pxx pyy pzz pxy pxz pyz
+
+restart 	${out_freq} restart.lmp.${pid} restart2.lmp.${pid}
+restart 	500 restart.lmp.${pid} restart2.lmp.${pid}
+restart 	500 restart.lmp.0 restart2.lmp.${pid}
+restart 	500 restart.lmp.0 restart2.lmp.0
+
+
+include         in.dump
+dump            myDump all atom ${out_freq2} dump.water.${pid}
+dump            myDump all atom 500 dump.water.${pid}
+dump            myDump all atom 500 dump.water.0
+dump            myDump2 all dcd ${out_freq2} dump.dcd
+dump            myDump2 all dcd 500 dump.dcd
+dump_modify     myDump append yes
+dump_modify     myDump2 append yes
+
+
+timer           timeout 23:50:00 every 1000
+New timer settings: style=normal  mode=nosync  timeout=23:50:00
+
+reset_timestep 0
+log log.wall.${pid}
+log log.wall.0
