@@ -1,0 +1,17 @@
+/tigress/ppiaggi/BiasedCoexistenceIces/IceIII/2-Bulk/Liquid
+della-r4c4n12
+Thu Nov  4 13:45:57 EDT 2021
+LAMMPS (15 Apr 2020)
+Running on 1 partitions of processors
+cp: cannot stat ‘log.lammps.1’: No such file or directory
+cp: cannot stat ‘restart2.lmp.1’: No such file or directory
+cp: cannot stat ‘restart.lmp.1’: No such file or directory
+cp: cannot stat ‘data.final.1’: No such file or directory
+cp: cannot stat ‘log.lammps.2’: No such file or directory
+cp: cannot stat ‘restart2.lmp.2’: No such file or directory
+cp: cannot stat ‘restart.lmp.2’: No such file or directory
+cp: cannot stat ‘data.final.2’: No such file or directory
+cp: cannot stat ‘log.lammps.3’: No such file or directory
+cp: cannot stat ‘restart2.lmp.3’: No such file or directory
+cp: cannot stat ‘restart.lmp.3’: No such file or directory
+cp: cannot stat ‘data.final.3’: No such file or directory
