@@ -1,0 +1,28 @@
+echo both
+
+include		in.partitions
+include		in.temp
+include		in.pressure
+include		in.seed
+units		real
+atom_style	full
+
+
+
+include 	in.box
+include 	in.setup
+include         in.dump
+
+timer           timeout 23:50:00 every 1000
+
+
+fix 		0 all shake 1e-6 200 0 b 1 a 1
+fix             1 all nph aniso ${pressure} ${pressure} ${pressureDamp}
+fix             2 all temp/csvr ${temperature} ${temperature} ${tempDamp} ${seed}
+velocity        all create ${temperature} ${seed}
+
+run             500000
+
+
+write_restart   restart.equil
+write_data   	water.equil.data nocoeff

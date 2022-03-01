@@ -1,0 +1,20 @@
+{
+    "in.temp":
+    {
+	"T": 300
+    },
+    "in.pressure":
+    {
+	"P": 10000
+    },
+    "start.lmp":
+    {
+	"meltPoint": "variable	meltPt equal (xlo)+(lx)/2.0",
+	"meltRegion": "region		meltReg prism ${meltPt} ${xhi} ${ylo} ${yhi} ${zlo} ${zhi} ${xy} ${xz} ${yz}",
+	"direction": "x",
+	"barostat": "aniso"
+    },
+    "in.box": {
+	"boxOption": ""
+    }
+}
