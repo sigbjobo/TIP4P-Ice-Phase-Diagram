@@ -1,0 +1,167 @@
+LAMMPS (30 Jul 2021)
+Processor partition = 1
+  using 1 OpenMP thread(s) per MPI task
+using multi-threaded neighbor list subroutines
+variable        pid world 0 1
+variable        phase world IceII IceIII
+
+shell cd ${phase}
+shell cd IceIII
+include Restart.lmp
+echo both
+log log.lammps
+#include		in.partitions
+include		in.temp
+variable        temperature equal -4.30
+variable	tempDamp equal 100.0
+include		in.pressure
+variable        pressure equal -1581.2
+variable        pressureDamp equal 1000.0 # This is 1 ps
+include		in.seed
+variable        seed equal 745823
+
+units		real
+atom_style	full
+
+read_restart	restart.lmp.${pid}
+read_restart	restart.lmp.1
+Reading restart file ...
+  restart file = 30 Jul 2021, LAMMPS = 30 Jul 2021
+  restoring atom style full from restart
+  orthogonal box = (0.0088704123 0.011557693 -0.19202733) to (19.991131 19.988443 20.892025)
+  4 by 4 by 4 MPI processor grid
+  restoring pair style lj/cut/tip4p/long/omp from restart
+  restoring bond style harmonic/omp from restart
+  restoring angle style harmonic/omp from restart
+  972 atoms
+  648 bonds
+  324 angles
+Finding 1-2 1-3 1-4 neighbors ...
+  special bond factors lj:    0        0        0       
+  special bond factors coul:  0        0        0       
+     2 = max # of 1-2 neighbors
+     1 = max # of 1-3 neighbors
+     1 = max # of 1-4 neighbors
+     2 = max # of special neighbors
+  special bonds CPU = 0.007 seconds
+  read_restart CPU = 0.018 seconds
+include 	in.setup
+variable	out_freq equal 1000
+variable	out_freq2 equal 10000
+variable	out_freq3 equal 1000
+
+timestep	2.0
+
+neigh_modify    delay 7 every 1
+
+include		in.tip4p
+# This is TIP4P/Ice
+
+# create groups ###
+group ox type 2
+324 atoms in group ox
+group hy type 1
+648 atoms in group hy
+
+# set charges - beside manually ###
+set group ox charge -1.1794
+Setting atom values ...
+  324 settings made for charge
+set group hy charge 0.5897
+Setting atom values ...
+  648 settings made for charge
+
+# ### TIP3P Potential Parameters ###
+pair_style lj/cut/tip4p/long/omp 2 1 1 1 0.1577 8.5
+pair_coeff 1 1*2 0.000 0.000
+pair_coeff 2 2 0.21084 3.1668
+bond_style  harmonic
+bond_coeff  1 450 0.9572
+angle_style harmonic
+angle_coeff 1 55 104.52
+kspace_style pppm/tip4p/omp 1.0e-5
+pair_modify tail yes
+
+thermo          ${out_freq}
+thermo          1000
+thermo_style    custom step temp pe etotal epair emol press lx ly lz vol pxx pyy pzz pxy pxz pyz enthalpy
+
+restart 	${out_freq3} restart.lmp.${pid} restart2.lmp.${pid}
+restart 	1000 restart.lmp.${pid} restart2.lmp.${pid}
+restart 	1000 restart.lmp.1 restart2.lmp.${pid}
+restart 	1000 restart.lmp.1 restart2.lmp.1
+
+
+include         in.dump
+dump            myDump all atom ${out_freq2} dump.water.${pid}
+dump            myDump all atom 10000 dump.water.${pid}
+dump            myDump all atom 10000 dump.water.1
+dump            myDump2 all dcd ${out_freq2} dump.dcd
+dump            myDump2 all dcd 10000 dump.dcd
+dump_modify     myDump append yes
+dump_modify     myDump2 append yes
+
+
+variable natoms 	equal  "count(all)"                        # NUMBER ATOMS
+variable H      	equal  "enthalpy/v_natoms"                 # ENTHALPY-per-atom
+variable Vol      	equal  "vol/v_natoms"                 # volume-per-atom
+fix AVG all 		ave/time ${out_freq} 1 ${out_freq} v_Vol v_H file vol_enthalpy.dat
+fix AVG all 		ave/time 1000 1 ${out_freq} v_Vol v_H file vol_enthalpy.dat
+fix AVG all 		ave/time 1000 1 1000 v_Vol v_H file vol_enthalpy.dat
+
+
+timer           timeout 02:55:00 every 1000
+New timer settings: style=normal  mode=nosync  timeout=02:55:00
+
+fix 		1 all shake 1e-6 200 0 b 1 a 1
+Finding SHAKE clusters ...
+       0 = # of size 2 clusters
+       0 = # of size 3 clusters
+       0 = # of size 4 clusters
+     324 = # of frozen angles
+  find clusters CPU = 0.001 seconds
+fix             2 all nph aniso ${pressure} ${pressure} ${pressureDamp}
+fix             2 all nph aniso -1581.2 ${pressure} ${pressureDamp}
+fix             2 all nph aniso -1581.2 -1581.2 ${pressureDamp}
+fix             2 all nph aniso -1581.2 -1581.2 1000
+fix             3 all temp/csvr ${temperature} ${temperature} ${tempDamp} ${seed}
+fix             3 all temp/csvr -4.3 ${temperature} ${tempDamp} ${seed}
+fix             3 all temp/csvr -4.3 -4.3 ${tempDamp} ${seed}
+fix             3 all temp/csvr -4.3 -4.3 100 ${seed}
+fix             3 all temp/csvr -4.3 -4.3 100 745823
+
+
+run             250000
+PPPM initialization ...
+  extracting TIP4P info from pair style
+  using 12-bit tables for long-range coulomb (../kspace.cpp:340)
+  G vector (1/distance) = 0.37208945
+  grid = 24 24 25
+  stencil order = 5
+  estimated absolute RMS force accuracy = 0.0034458501
+  estimated relative force accuracy = 1.0377075e-05
+  using double precision FFTW3
+  3d grid and FFT values/proc = 2366 288
+Last active /omp style is kspace_style pppm/tip4p/omp
+Neighbor list info ...
+  update every 1 steps, delay 7 steps, check yes
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 10.8154
+  ghost atom cutoff = 10.8154
+  binsize = 5.4077, bins = 4 4 4
+  1 neighbor lists, perpetual/occasional/extra = 1 0 0
+  (1) pair lj/cut/tip4p/long/omp, perpetual
+      attributes: half, newton on, omp
+      pair build: half/bin/newton/omp
+      stencil: half/bin/3d
+      bin: standard
+Setting up Verlet run ...
+  Unit style    : real
+  Current step  : 14500000
+  Time step     : 2
+  Walltime left : 2:54:59.93
+Per MPI rank memory allocation (min/avg/max) = 9.228 | 9.230 | 9.237 Mbytes
+Step Temp PotEng TotEng E_pair E_mol Press Lx Ly Lz Volume Pxx Pyy Pzz Pxy Pxz Pyz Enthalpy 
+14500000    3.5443404   -5246.1909   -5239.3554   -5246.1909            0   -1455.4232     19.98226    19.976886    21.084053    8416.4023   -1318.4493   -1446.9777   -1600.8427    -139.7732    48.172632   -63.077569   -5418.0007 
+ERROR: Non-numeric pressure - simulation unstable (../fix_nh.cpp:1069)
+Last command: run             250000
