@@ -11,19 +11,19 @@
 export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
 export PLUMED_NUM_THREADS=$SLURM_CPUS_PER_TASK
 
-pwd; hostname; date
-module load fftw openmpi
+#pwd; hostname; date
+#module load fftw openmpi
 
 
 ############################################################################
 # Variables definition
 ############################################################################
-export LAMMPS_EXE=/home/sbore/software/mbx_lammps_plumed/lammps/src/lmp_mpi_mbx
-
+#export LAMMPS_EXE=/home/sbore/software/mbx_lammps_plumed/lammps/src/lmp_mpi_mbx
+source ~/env/lammps.sh
 cycles=2
 threads_per_partition=1
 
 
 module load fftw openmpi
-srun /home/sbore/software/mbx_lammps_plumed/lammps/src/lmp_mpi_mbx -sf omp -in start.lmp
+srun $LAMMPS_EXE -in start.lmp
 #cat $task_file | xargs -l -P 3  bash -c 'cd $0; pwd; mpirun -np 42 /home/sbore/software/mbx_lammps_plumed/lammps/src/lmp_mpi_mbx -sf omp -in start.lmp'

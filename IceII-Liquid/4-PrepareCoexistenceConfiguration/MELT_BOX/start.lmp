@@ -26,11 +26,11 @@ unfix           2
 
 
 # create group to melt
-variable	meltPt equal (xlo)+(lx)/2.0
-variable	xlo equal (xlo)
-variable	xhi equal (xhi)
-variable	ylo equal (ylo)
-variable	yhi equal (yhi)
+variable	meltPt equal (zlo)+(lz)/2.0
+variable	xlo equal (xlo)-100
+variable	xhi equal (xhi)+100
+variable	ylo equal (ylo)-100
+variable	yhi equal (yhi)+100
 variable	zlo equal (zlo)
 variable	zhi equal (zhi)
 
@@ -39,7 +39,8 @@ variable	xz equal (xz)
 variable	yz equal (yz)
 
 
-region		meltReg prism ${meltPt} ${xhi} ${ylo} ${yhi} ${zlo} ${zhi} ${xy} ${xz} ${yz} units box
+#region		meltReg prism ${xlo} ${xhi} ${ylo} ${yhi} ${meltPt} ${zhi} ${xy} ${xz} ${yz} units box
+region 		meltReg block ${xlo} INF ${ylo} INF ${meltPt} INF
 group		tstatGrp region meltReg
 
 # melt half the box in NPT

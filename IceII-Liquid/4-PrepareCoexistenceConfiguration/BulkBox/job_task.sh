@@ -12,13 +12,6 @@ export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
 export PLUMED_NUM_THREADS=$SLURM_CPUS_PER_TASK
 
 pwd; hostname; date
-module load fftw openmpi
-
-
-############################################################################
-# Variables definition
-############################################################################
-export LAMMPS_EXE=/home/sbore/software/mbx_lammps_plumed/lammps/src/lmp_mpi_mbx
 
 cycles=2
 threads_per_partition=1
