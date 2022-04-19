@@ -1,6 +1,0 @@
-echo both
-variable        pid world 0 1
-variable        phase world IceII IceVI
-
-shell cd ${phase}
-include start.lmp

@@ -1,0 +1,14 @@
+LAMMPS (7 Jan 2022)
+Processor partition = 1
+  using 2 OpenMP thread(s) per MPI task
+package omp 0
+using multi-threaded neighbor list subroutines
+echo both
+variable        pid world 0 1
+variable        phase world IceII IceIh
+
+shell cd ${phase}
+shell cd IceIh
+include Restart.lmp
+echo both
+log log.lammps

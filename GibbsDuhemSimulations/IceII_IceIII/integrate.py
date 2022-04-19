@@ -111,8 +111,6 @@ def fn(y,x):
     
  
         # Replace starting configuration by previous
-
-
         if abs(I)>0:
             closest=glob.glob(args.root_fold+str(int(I-np.sign(dt)))+'_*_*/')[0]
         else:
@@ -158,9 +156,6 @@ include Restart.lmp""".format(args.left.strip('/'),args.right.strip('/')))
             # Run equilibration
             cmd  ='sed -i  \"s#run .*#run             {}#g\" {}/start.lmp\n'.format(args.steps_per_sim,name_sim+args.right)
             cmd  +='sed -i  \"s#run .*#run             {}#g\" {}/start.lmp\n'.format(args.steps_per_sim,name_sim+args.left)
-            #cmd  += '{{\n cd {}\n {} {} -sf omp -in start.lmp\n}}&\n'.format(name_sim+args.left,args.run_cmd,args.lmp_exe)
-            # cmd  += '{{\n cd {}\n {} {}  -sf omp -in start.lmp\n}}&\n'.format(name_sim+args.right,args.run_cmd,args.lmp_exe)
-            # cmd  += 'wait\n'.format(name_sim+args.right,args.lmp_exe)
             cmd+= 'cd {}\n {} {} {}  -in start_both.lmp\n'.format(name_sim,args.run_cmd,args.lmp_exe,args.lmp_options) 
             os.system(cmd) 
 
@@ -168,22 +163,11 @@ include Restart.lmp""".format(args.left.strip('/'),args.right.strip('/')))
         cmd  ='sed -i  \"s#run .*#run             {}#g\" {}/Restart.lmp\n'.format(args.steps_per_sim,name_sim+args.right)
         cmd  +='sed -i  \"s#run .*#run             {}#g\" {}/Restart.lmp\n'.format(args.steps_per_sim,name_sim+args.left)
         cmd+= 'cd {}\n {} {} {}  -in Restart_both.lmp\n'.format(name_sim,args.run_cmd,args.lmp_exe,args.lmp_options) 
-        #cmd += '{{\n cd {}\n {} {} -sf omp -in Restart.lmp\n}}&\n'.format(name_sim+args.left,args.run_cmd,args.lmp_exe)
-        #cmd += '{{\n cd {}\n {} {}  -sf omp -in Restart.lmp\n}}&\n'.format(name_sim+args.right,args.run_cmd,args.lmp_exe)
-        #cmd += 'wait\n'
         os.system(cmd)
 
     # Gather result
     log_Liquid = np.loadtxt(name_sim+args.right+'/vol_enthalpy.dat')
-    log_IceIh  = np.loadtxt(name_sim+args.left+'/vol_enthalpy.dat')
-
-    # #Number of atoms
-    # n_iceIh  = int(os.popen(' grep -nr atoms {} | grep Loop'.format(name_sim+args.left+'/log.lammps')).read().split()[-2])
-    # n_liquid = int(os.popen(' grep -nr atoms {} | grep Loop'.format(name_sim+args.right+'/log.lammps')).read().split()[-2])
-
-#    log_Liquid = extract_form_log(name_sim+args.right+'/vol_enthalpy.dat')
-#    log_IceIh  = extract_form_log(name_sim+args.left+'/vol_enthalpy.dat')
- 
+    log_IceIh  = np.loadtxt(name_sim+args.left+'/vol_enthalpy.dat') 
     
     production=int(len(log_IceIh[:,0])*args.percent_equilibration/100.)
     h_iceIh  = np.mean(log_IceIh[:,2][production:])#/n_iceIh
