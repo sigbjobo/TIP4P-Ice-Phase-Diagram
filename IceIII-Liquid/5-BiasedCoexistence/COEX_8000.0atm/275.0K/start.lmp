@@ -11,7 +11,7 @@ include 	in.setup
 
 
 
-timer           timeout 23:30:00 every 1000
+timer           timeout 72:30:00 every 1000
 
 
 # Equilibrate to specified number of ice
@@ -42,7 +42,7 @@ fix 		2 all shake 1e-6 200 0 b 1 a 1
 fix             3 all nph x ${pressure} ${pressure} ${pressureDamp}
 fix             4 all temp/csvr ${temperature} ${temperature} ${tempDamp} ${seed}
 
-run             2500000 upto
+run             5000000 upto
 
 unfix		4
 unfix		3
