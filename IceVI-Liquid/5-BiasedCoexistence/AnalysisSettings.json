@@ -1,6 +1,6 @@
 {
-    "singlePressure": "10000.0atm",
-    "singleTemperature": "280.0K",
+    "singlePressure": "8000.0atm",
+    "singleTemperature": "260.0K",
     "n_temps": 5,
     "n_press": 3,
     "nmpi": 4,

@@ -14,7 +14,7 @@ timer           timeout 23:30:00 every 1000
 
 fix             1 all plumed plumedfile plumed.dat outfile plumed.out
 fix 		2 all shake 1e-6 200 0 b 1 a 1
-fix             3 all nph y ${pressure} ${pressure} ${pressureDamp}
+fix             3 all nph x ${pressure} ${pressure} ${pressureDamp}
 fix             4 all temp/csvr ${temperature} ${temperature} ${tempDamp} ${seed}
 
 run             5000000 upto
