@@ -1,6 +1,6 @@
 echo both
-
-include		in.partitions
+log log.lammps
+#include		in.partitions
 include		in.temp
 include		in.pressure
 include		in.seed
