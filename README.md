@@ -1,4 +1,5 @@
-# Phase diagram of TIP4P/Ice
+# Phase diagram of the TIP4P/Ice water model by enhanced sampling simulations
+## Sigbjørn L. Bore, Pablo M. Piaggi, Roberto Car, and Francesco Paesani
 
 * ```FullPhaseDiagram``` : This folder contains the jupyter-notebook for determining triple points and plotting the full phase diagram.
 * ```GibbsDuhemSimulations``` : Preparation and execution of Gibbs-Duhem simulations for determination of coexistence lines.
